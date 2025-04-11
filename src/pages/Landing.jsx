@@ -4,14 +4,22 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "@/configs/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, googleProvider, db } from "@/configs/firebase";
 
 function Landing() {
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-      console.log("Logged in as:", user.displayName);
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        createdAt: new Date().toISOString()
+      }, { merge: true });
     } catch (error) {
       console.error("Google login error:", error);
     }
