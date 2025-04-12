@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button"
 import { signInWithPopup } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, googleProvider, db } from "@/configs/firebase";
+import { useNavigate } from 'react-router-dom';
 
 function Landing() {
+  const navigate = useNavigate();
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
@@ -20,10 +22,11 @@ function Landing() {
         photoURL: user.photoURL,
         createdAt: new Date().toISOString()
       }, { merge: true });
+        navigate("/dashboard");
     } catch (error) {
       console.error("Google login error:", error);
     }
-  };
+  };  
   return (
     <>
         <Card className="mx-auto max-w-sm mt-[22vh]">
