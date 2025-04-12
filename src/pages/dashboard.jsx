@@ -29,6 +29,7 @@ function Dashboard() {
   const [selectedPlatform, setSelectedPlatform] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [isJobUpdate, setIsJobUpdate] = useState(false);
+  const [postContent, setPostContent] = useState(""); 
   const isDarkMode = useDarkMode();
 
   const handleImageChange = (e) => {
@@ -64,17 +65,26 @@ function Dashboard() {
               {/* Post Content */}
               <div className="grid w-full items-center gap-1.5 h-40">
                 <Label htmlFor="post">Enter Post Content</Label>
-                <Textarea
-                  id="post"
-                  placeholder="..."
-                  className="w-full h-full resize-none"
-                  maxLength={
-                    selectedPlatform === "x" || selectedPlatform === "threads"
-                      ? 140
-                      : undefined
-                  }
-                />
-                {(selectedPlatform === "x" || selectedPlatform === "threads") && (
+                <div className="grid w-full items-start gap-1.5 relative">
+                  <Textarea
+                    id="post"
+                    value={postContent}
+                    onChange={(e) => setPostContent(e.target.value)}
+                    placeholder="..."
+                    className="w-full h-[15vh] resize-none pr-12"
+                    maxLength={
+                      selectedPlatform === "twitter" || selectedPlatform === "threads"
+                        ? 140
+                        : undefined
+                    }
+                  />
+                  {(selectedPlatform === "twitter" || selectedPlatform === "threads") && (
+                    <span className="absolute bottom-2 right-3 text-xs text-muted-foreground">
+                      {postContent.length}/140
+                    </span>
+                  )}
+                </div>
+                {(selectedPlatform === "twitter" || selectedPlatform === "threads") && (
                   <span className="text-xs text-gray-500">Max 140 characters</span>
                 )}
               </div>
