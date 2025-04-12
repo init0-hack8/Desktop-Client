@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Landing from "../pages/Landing";
 import Layout from "../pages/Layout";
+import UploadDashboard from "@/pages/dashboard";
 
 const router=createBrowserRouter([
     {
@@ -26,6 +27,14 @@ const router=createBrowserRouter([
         element:(
             <>
                 <h1>Login Page</h1>
+            </>
+        )
+    },
+    {
+        path:"/dashboard",
+        element:(
+            <>
+                <UploadDashboard />
             </>
         )
     },
