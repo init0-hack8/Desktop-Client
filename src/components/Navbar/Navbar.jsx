@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Link } from 'react-router-dom';
-import { onAuthStateChanged } from "firebase/auth";
+import { Link, useNavigate } from 'react-router-dom';
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/configs/firebase";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,DropdownMenuSeparator,DropdownMenuTrigger} from "@/components/ui/dropdown-menu"
 
 const Navbar = () => {
   return (
@@ -70,28 +71,46 @@ const Navbar = () => {
   </header>
 )
 }
-
-function UserProfileLink(){
+function UserProfileLink() {
+  const navigate = useNavigate();
   const [photoURL, setPhotoURL] = useState(null);
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error", error);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user && user.photoURL) {
-        setPhotoURL(user.photoURL);
-      } else {
-        setPhotoURL(null);
-      }
+      setPhotoURL(user?.photoURL || null);
     });
     return () => unsubscribe();
   }, []);
+
   if (!photoURL) return null;
+
   return (
-    <Link to="/profile">
-      <img
-        src={photoURL}
-        alt="Profile"
-        className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600"
-      />
-    </Link>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <img
+          src={photoURL}
+          alt="Profile"
+          className="w-10 h-10 rounded-full border border-gray-300 dark:border-gray-600 cursor-pointer"
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="transition-colors duration-150">
+        <DropdownMenuItem
+          onClick={logout}
+          className="cursor-pointer text-red-500 font-semibold hover:text-red-600"
+        >
+          LogOut
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
