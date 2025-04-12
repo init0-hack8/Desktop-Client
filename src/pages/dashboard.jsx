@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Upload, AlertCircle, Check } from "lucide-react";
+import Navbar from "@/components/Navbar/Navbar";
 
 // This is a completely self-contained component with no external dependencies
 // besides React and lucide-react for icons
@@ -199,6 +200,8 @@ export default function UploadDashboard() {
   );
 
   return (
+    <>
+    <Navbar />
     <div className="max-w-3xl mx-auto py-8 px-4">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold mb-2">Image Analysis Dashboard</h1>
@@ -328,5 +331,6 @@ export default function UploadDashboard() {
         </CardFooter>
       </Card>
     </div>
+    </>
   );
 }
