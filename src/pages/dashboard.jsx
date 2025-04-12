@@ -1,336 +1,200 @@
-import React, { useState, useRef } from "react";
-import { Upload, AlertCircle, Check } from "lucide-react";
-import Navbar from "@/components/Navbar/Navbar";
+import React, { useState } from 'react';
+import Navbar from '../components/Navbar/Navbar';
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Checkbox } from "@/components/ui/checkbox"
 
-// This is a completely self-contained component with no external dependencies
-// besides React and lucide-react for icons
-export default function UploadDashboard() {
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState({ show: false, type: '', message: '' });
-  const [formValues, setFormValues] = useState({
-    title: '',
-    description: '',
-    backstory: ''
-  });
-  const fileInputRef = useRef(null);
+function Dashboard() {
+  const [selectedPlatform, setSelectedPlatform] = useState(null);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [isJobUpdate, setIsJobUpdate] = useState(false);
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      setImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+    const files = Array.from(e.target.files);
+    const previews = [];
+
+    files.forEach((file) => {
+      if (file && file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          previews.push(reader.result);
+          if (previews.length === files.length) {
+            setImagePreviews(previews);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    if (files.length === 0) setImagePreviews([]);
   };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      setImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormValues(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!image || !formValues.title || !formValues.description) {
-      setAlert({
-        show: true,
-        type: 'error',
-        message: 'Please complete all required fields'
-      });
-      return;
-    }
-    
-    setLoading(true);
-    
-    // Create form data for submission
-    const formData = new FormData();
-    formData.append('image', image);
-    formData.append('title', formValues.title);
-    formData.append('description', formValues.description);
-    formData.append('backstory', formValues.backstory);
-    
-    try {
-      // Simulate API call - replace with actual Gemini API integration
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setAlert({
-        show: true,
-        type: 'success',
-        message: 'Image successfully analyzed! Redirecting to results...'
-      });
-      
-      // In a real implementation, redirect to results or update UI
-      console.log('Form data submitted:', {
-        image: image.name,
-        ...formValues
-      });
-      
-    } catch (error) {
-      setAlert({
-        show: true,
-        type: 'error',
-        message: 'Error processing your request. Please try again.'
-      });
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Self-contained UI components with shadcn-inspired styling
-  const Card = ({ children, className }) => (
-    <div className={`rounded-lg border border-gray-200 bg-white shadow-sm ${className || ''}`}>
-      {children}
-    </div>
-  );
-
-  const CardHeader = ({ children, className }) => (
-    <div className={`flex flex-col space-y-1.5 p-6 ${className || ''}`}>
-      {children}
-    </div>
-  );
-
-  const CardTitle = ({ children, className }) => (
-    <h3 className={`text-2xl font-semibold leading-none tracking-tight ${className || ''}`}>
-      {children}
-    </h3>
-  );
-
-  const CardDescription = ({ children, className }) => (
-    <p className={`text-sm text-gray-500 ${className || ''}`}>
-      {children}
-    </p>
-  );
-
-  const CardContent = ({ children, className }) => (
-    <div className={`p-6 pt-0 ${className || ''}`}>
-      {children}
-    </div>
-  );
-
-  const CardFooter = ({ children, className }) => (
-    <div className={`flex items-center p-6 pt-0 ${className || ''}`}>
-      {children}
-    </div>
-  );
-
-  const Label = ({ htmlFor, children, className }) => (
-    <label
-      htmlFor={htmlFor}
-      className={`text-sm font-medium leading-none ${className || ''}`}
-    >
-      {children}
-    </label>
-  );
-
-  const Input = ({ className, ...props }) => (
-    <input
-      className={`flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${className || ''}`}
-      {...props}
-    />
-  );
-
-  const Textarea = ({ className, ...props }) => (
-    <textarea
-      className={`flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${className || ''}`}
-      {...props}
-    />
-  );
-
-  const Button = ({ children, className, ...props }) => (
-    <button
-      className={`inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 ${className || ''}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-
-  const Alert = ({ children, type, className }) => (
-    <div
-      role="alert"
-      className={`relative w-full rounded-lg border p-4 [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&:has(svg)]:pl-11 ${
-        type === 'error' 
-          ? 'bg-red-50 border-red-200 text-red-800' 
-          : 'bg-green-50 border-green-200 text-green-800'
-      } ${className || ''}`}
-    >
-      {children}
-    </div>
-  );
-
-  const AlertTitle = ({ children, className }) => (
-    <h5 className={`mb-1 font-medium leading-none tracking-tight ${className || ''}`}>
-      {children}
-    </h5>
-  );
-
-  const AlertDescription = ({ children, className }) => (
-    <div className={`text-sm [&_p]:leading-relaxed ${className || ''}`}>
-      {children}
-    </div>
-  );
 
   return (
     <>
-    <Navbar />
-    <div className="max-w-3xl mx-auto py-8 px-4">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">Image Analysis Dashboard</h1>
-        <p className="text-gray-500">Upload your image and get AI-powered analysis and insights</p>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Upload Image</CardTitle>
-          <CardDescription>
-            Fill out the form below to analyze your image with Gemini AI
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="image">Image Upload</Label>
-              <div
-                className="mt-2 border-2 border-dashed rounded-lg p-6 text-center cursor-pointer border-gray-300 hover:border-gray-400"
-                onClick={() => fileInputRef.current.click()}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  id="image"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
+      <Navbar />
+      <div className='flex flex-col items-center mt-[5vh] gap-5'>
+        <div className="flex flex-row gap-10">
+          {/* Left Card */}
+          <Card className="w-[40vw]">
+            <CardContent className="p-6 space-y-4">
+              {/* Post Content */}
+              <div className="grid w-full items-center gap-1.5 h-40">
+                <Label htmlFor="post">Enter Post Content</Label>
+                <Textarea
+                  id="post"
+                  placeholder="..."
+                  className="w-full h-full resize-none"
+                  maxLength={
+                    selectedPlatform === "x" || selectedPlatform === "threads"
+                      ? 140
+                      : undefined
+                  }
                 />
-                {preview ? (
-                  <div className="flex flex-col items-center">
-                    <img 
-                      src={preview}
-                      alt="Preview" 
-                      className="max-h-64 rounded-md mb-2" 
-                    />
-                    <p className="text-sm text-gray-500">Click to change image</p>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center">
-                    <Upload className="w-12 h-12 text-gray-400 mb-2" />
-                    <p>Drag and drop your image here or click to browse</p>
-                  </div>
+                {(selectedPlatform === "x" || selectedPlatform === "threads") && (
+                  <span className="text-xs text-gray-500">Max 140 characters</span>
                 )}
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
-              <p className="text-sm text-gray-500">Give your upload a title</p>
-              <Input
-                id="title"
-                name="title"
-                value={formValues.title}
-                onChange={handleInputChange}
-                placeholder="Title for your image"
-                className="mt-1"
-                required
-              />
-            </div>
+              {/* LinkedIn Job Update */}
+              {selectedPlatform === "linkedin" && (
+                <div className="flex items-center gap-2"> 
+                  <Checkbox id="jobUpdate" />
+                  <Label
+                    htmlFor="is it a job update?"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Accept terms and conditions
+                  </Label>
+                </div>
+              )}
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <p className="text-sm text-gray-500">Describe what's in this image</p>
-              <Textarea
-                id="description"
-                name="description"
-                value={formValues.description}
-                onChange={handleInputChange}
-                placeholder="Enter a detailed description of your image"
-                className="mt-1"
-                rows={3}
-                required
-              />
-            </div>
+              {/* Image Preview */}
+              <div className="border-2 border-dashed border-gray-200 rounded-lg flex flex-col gap-1 p-6 items-center">
+                {imagePreviews.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {imagePreviews.map((src, i) => (
+                      <img
+                        key={i}
+                        src={src}
+                        alt={`Preview ${i}`}
+                        className="max-h-40 rounded-lg border"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    <FileIcon className="w-12 h-12" />
+                    <span className="text-sm font-medium text-gray-500">
+                      Drag and drop a file or click to browse
+                    </span>
+                    <span className="text-xs text-gray-500">PDF, image, video, or audio</span>
+                  </>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="backstory">Backstory (optional)</Label>
-              <p className="text-sm text-gray-500">Share any background context or story behind this image</p>
-              <Textarea
-                id="backstory"
-                name="backstory"
-                value={formValues.backstory}
-                onChange={handleInputChange}
-                placeholder="Add any relevant backstory or context"
-                className="mt-1"
-                rows={3}
-              />
-            </div>
+              {/* File Input */}
+              <div className="space-y-2 text-sm">
+                <Label htmlFor="file" className="text-sm font-medium">
+                  File
+                </Label>
+                <Input
+                  id="file"
+                  type="file"
+                  accept="image/*"
+                  multiple={selectedPlatform === "instagram"}
+                  onChange={handleImageChange}
+                />
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button size="lg">Upload</Button>
+            </CardFooter>
+          </Card>
 
-            {alert.show && (
-              <Alert type={alert.type}>
-                {alert.type === 'error' ? 
-                  <AlertCircle className="h-4 w-4" /> : 
-                  <Check className="h-4 w-4" />
-                }
-                <AlertTitle>
-                  {alert.type === 'error' ? 'Error' : 'Success'}
-                </AlertTitle>
-                <AlertDescription>
-                  {alert.message}
-                </AlertDescription>
-              </Alert>
-            )}
-          </form>
-        </CardContent>
-        
-        <CardFooter>
-          <Button 
-            type="submit" 
-            onClick={handleSubmit} 
-            disabled={loading}
-            className="w-full"
-          >
-            {loading ? (
-              <React.Fragment>
-                <span className="mr-2">Analyzing</span>
-                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              </React.Fragment>
-            ) : (
-              'Analyze with AI'
-            )}
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+          {/* Right Card: Platform Selection */}
+          <Card>
+            <ToggleGroup
+              type="single"
+              value={selectedPlatform}
+              onValueChange={(val) => setSelectedPlatform(val)}
+              className="grid grid-cols-3 gap-4 w-full max-w-4xl mx-auto p-4"
+            >
+              <ToggleGroupItem
+                value="x"
+                variant="outline"
+                className="flex flex-col items-center justify-center p-6 w-full h-36"
+              >
+                <img src="./twitterDarkMode.svg" className="w-20 mb-2" alt="X" />
+                <Label className="text-lg">X</Label>
+              </ToggleGroupItem>
+
+              <ToggleGroupItem
+                value="instagram"
+                variant="outline"
+                className="flex flex-col items-center justify-center p-6 w-full h-36"
+              >
+                <img src="./instagramDarkMode.svg" className="w-20 mb-2" alt="Instagram" />
+                <Label className="text-lg">Instagram</Label>
+              </ToggleGroupItem>
+
+              <ToggleGroupItem
+                value="facebook"
+                variant="outline"
+                className="flex flex-col items-center justify-center p-6 w-full h-36"
+              >
+                <img src="./facebookDarkMode.svg" className="w-20 mb-2" alt="Facebook" />
+                <Label className="text-lg">Facebook</Label>
+              </ToggleGroupItem>
+
+              <ToggleGroupItem
+                value="threads"
+                variant="outline"
+                className="flex flex-col items-center justify-center p-6 w-full h-36"
+              >
+                <img src="./threadsDarkMode.svg" className="w-20 mb-2" alt="Threads" />
+                <Label className="text-lg">Threads</Label>
+              </ToggleGroupItem>
+
+              <ToggleGroupItem
+                value="linkedin"
+                variant="outline"
+                className="flex flex-col items-center justify-center p-6 w-full h-36"
+              >
+                <img src="./linkedinDarkMode.svg" className="w-20 mb-2" alt="LinkedIn" />
+                <Label className="text-lg">LinkedIn</Label>
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </Card>
+        </div>
+        <Button size="lg" className="w-40">Submit</Button>
+      </div>
     </>
   );
 }
+
+// File icon component
+function FileIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+    </svg>
+  );
+}
+
+export default Dashboard;
