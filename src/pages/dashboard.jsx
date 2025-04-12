@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getAuth } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/configs/firebase";
+import { v4 as uuidv4 } from 'uuid';
 
 function useDarkMode() {
   const [isDark, setIsDark] = useState(false);
@@ -102,14 +103,15 @@ function Dashboard() {
       }
     }
 
-    const postId = `post-${Date.now()}`;
-    const postRef = doc(db, "posts", postId);
+    const postId = `post-${uuidv4()}`;
+    const postRef = doc(db, "post", postId);
     const postData = {
       uid: currentUser.uid,
       imageUrls: uploadedImageUrls,
       description: postContent,
       platform: selectedPlatform,
       isJobUpdate,
+      postId: postId,
       createdAt: new Date().toISOString(),
     };
 
