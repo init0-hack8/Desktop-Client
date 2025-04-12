@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar/Navbar';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -6,12 +6,30 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@/components/ui/checkbox";
+
+// Custom dark mode hook
+function useDarkMode() {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
+    setIsDark(matchMedia.matches);
+
+    const handler = (e) => setIsDark(e.matches);
+    matchMedia.addEventListener("change", handler);
+
+    return () => matchMedia.removeEventListener("change", handler);
+  }, []);
+
+  return isDark;
+}
 
 function Dashboard() {
   const [selectedPlatform, setSelectedPlatform] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [isJobUpdate, setIsJobUpdate] = useState(false);
+  const isDarkMode = useDarkMode();
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -32,6 +50,8 @@ function Dashboard() {
 
     if (files.length === 0) setImagePreviews([]);
   };
+
+  const getIcon = (platform) => `./${platform}${isDarkMode ? 'DarkMode' : 'LightMode'}.svg`;
 
   return (
     <>
@@ -61,7 +81,7 @@ function Dashboard() {
 
               {/* LinkedIn Job Update */}
               {selectedPlatform === "linkedin" && (
-                <div className="flex items-center gap-2"> 
+                <div className="flex items-center gap-2">
                   <Checkbox id="jobUpdate" />
                   <Label
                     htmlFor="is it a job update?"
@@ -123,50 +143,17 @@ function Dashboard() {
               onValueChange={(val) => setSelectedPlatform(val)}
               className="grid grid-cols-3 gap-4 w-full max-w-4xl mx-auto p-4"
             >
-              <ToggleGroupItem
-                value="x"
-                variant="outline"
-                className="flex flex-col items-center justify-center p-6 w-full h-36"
-              >
-                <img src="./twitterDarkMode.svg" className="w-20 mb-2" alt="X" />
-                <Label className="text-lg">X</Label>
-              </ToggleGroupItem>
-
-              <ToggleGroupItem
-                value="instagram"
-                variant="outline"
-                className="flex flex-col items-center justify-center p-6 w-full h-36"
-              >
-                <img src="./instagramDarkMode.svg" className="w-20 mb-2" alt="Instagram" />
-                <Label className="text-lg">Instagram</Label>
-              </ToggleGroupItem>
-
-              <ToggleGroupItem
-                value="facebook"
-                variant="outline"
-                className="flex flex-col items-center justify-center p-6 w-full h-36"
-              >
-                <img src="./facebookDarkMode.svg" className="w-20 mb-2" alt="Facebook" />
-                <Label className="text-lg">Facebook</Label>
-              </ToggleGroupItem>
-
-              <ToggleGroupItem
-                value="threads"
-                variant="outline"
-                className="flex flex-col items-center justify-center p-6 w-full h-36"
-              >
-                <img src="./threadsDarkMode.svg" className="w-20 mb-2" alt="Threads" />
-                <Label className="text-lg">Threads</Label>
-              </ToggleGroupItem>
-
-              <ToggleGroupItem
-                value="linkedin"
-                variant="outline"
-                className="flex flex-col items-center justify-center p-6 w-full h-36"
-              >
-                <img src="./linkedinDarkMode.svg" className="w-20 mb-2" alt="LinkedIn" />
-                <Label className="text-lg">LinkedIn</Label>
-              </ToggleGroupItem>
+              {["twitter", "instagram", "facebook", "threads", "linkedin"].map((platform) => (
+                <ToggleGroupItem
+                  key={platform}
+                  value={platform}
+                  variant="outline"
+                  className="flex flex-col items-center justify-center p-6 w-full h-36"
+                >
+                  <img src={getIcon(platform)} className="w-20 mb-2" alt={platform} />
+                  <Label className="text-lg">{platform.charAt(0).toUpperCase() + platform.slice(1)}</Label>
+                </ToggleGroupItem>
+              ))}
             </ToggleGroup>
           </Card>
         </div>
