@@ -3,6 +3,7 @@ import Landing from "../pages/Landing";
 import Layout from "../pages/Layout";
 import Dashboard from "@/pages/dashboard";
 import History from "@/pages/history";
+import GraphTemp from "@/pages/graphTemp";
 
 const router=createBrowserRouter([
     {
@@ -44,6 +45,14 @@ const router=createBrowserRouter([
         element:(
             <>
                 <History />
+            </>
+        )
+    },
+    {
+        path: "/graph",
+        element:(
+            <>
+                <GraphTemp />
             </>
         )
     },
