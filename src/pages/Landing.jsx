@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -53,7 +53,7 @@ function Landing() {
             or
           </div>
           <Button onClick={handleGoogleLogin} type="submit" className="w-full">
-            <img src="./google.svg" className='w-[2.5vh]'></img>
+            <GoogleIcon />
             Login with google
           </Button>
         </div>
@@ -61,6 +61,21 @@ function Landing() {
     </Card>
     </>
   )
+}
+
+function GoogleIcon(props) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  useEffect(() => {
+    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDarkMode(darkModeQuery.matches);
+    const listener = (e) => setIsDarkMode(e.matches);
+    darkModeQuery.addEventListener('change', listener);
+    return () => darkModeQuery.removeEventListener('change', listener);
+  }, []);
+  const iconSrc = isDarkMode ? './googleDarkMode.svg' : './googleLightMode.svg';
+  return (
+    <img src={iconSrc} className="w-[2.5vh]" alt="Mountain" />
+  );
 }
 
 export default Landing
