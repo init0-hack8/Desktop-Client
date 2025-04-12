@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Landing from "../pages/Landing";
 import Layout from "../pages/Layout";
 import Dashboard from "@/pages/dashboard";
+import History from "@/pages/history";
 
 const router=createBrowserRouter([
     {
@@ -35,6 +36,14 @@ const router=createBrowserRouter([
         element:(
             <>
                 <Dashboard />
+            </>
+        )
+    },
+    {
+        path:"/history",
+        element:(
+            <>
+                <History />
             </>
         )
     },
