@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Landing from "../pages/Landing";
 import Layout from "../pages/Layout";
-import UploadDashboard from "@/pages/dashboard";
+import Dashboard from "@/pages/dashboard";
 
 const router=createBrowserRouter([
     {
@@ -34,7 +34,7 @@ const router=createBrowserRouter([
         path:"/dashboard",
         element:(
             <>
-                <UploadDashboard />
+                <Dashboard />
             </>
         )
     },
