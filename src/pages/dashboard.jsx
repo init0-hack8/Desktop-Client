@@ -29,6 +29,7 @@ function Dashboard() {
   const [imageFiles, setImageFiles] = useState([]);
   const [isJobUpdate, setIsJobUpdate] = useState(false);
   const [postContent, setPostContent] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const isDarkMode = useDarkMode();
 
   const handleImageChange = (e) => {
@@ -53,15 +54,24 @@ function Dashboard() {
   };
 
   const handleCloudinaryUpload = async () => {
+    if (!selectedPlatform) {
+      alert("No Platform is selected");
+      return;
+    }
+
+    setIsUploading(true);
+
     const auth = getAuth();
     const currentUser = auth.currentUser;
     if (!currentUser) {
       alert("You must be logged in to upload");
+      setIsUploading(false);
       return;
     }
 
     if (imageFiles.length === 0 || !postContent.trim()) {
       alert("Please select images and add a description.");
+      setIsUploading(false);
       return;
     }
 
@@ -82,7 +92,6 @@ function Dashboard() {
         });
 
         const data = await res.json();
-        console.log("Here is uploaded image urls : ", data);
         if (data.secure_url) {
           uploadedImageUrls.push(data.secure_url);
         } else {
@@ -93,7 +102,6 @@ function Dashboard() {
       }
     }
 
-    // Save to Firestore
     const postId = `post-${Date.now()}`;
     const postRef = doc(db, "posts", postId);
     const postData = {
@@ -111,6 +119,8 @@ function Dashboard() {
     } catch (error) {
       console.error("Error saving to Firestore:", error);
     }
+
+    setIsUploading(false);
   };
 
   const getIcon = (platform) => `./${platform}${isDarkMode ? 'DarkMode' : 'LightMode'}.svg`;
@@ -183,7 +193,13 @@ function Dashboard() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button size="lg" onClick={handleCloudinaryUpload}>Create Post</Button>
+              <Button
+                size="lg"
+                onClick={handleCloudinaryUpload}
+                disabled={isUploading}
+              >
+                {isUploading ? "Uploading..." : "Create Post"}
+              </Button>
             </CardFooter>
           </Card>
 
