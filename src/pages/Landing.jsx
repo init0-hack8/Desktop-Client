@@ -15,14 +15,16 @@ function Landing() {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       const userRef = doc(db, 'users', user.uid);
-      await setDoc(userRef, {
+      const userData = {
         uid: user.uid,
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
         createdAt: new Date().toISOString()
-      }, { merge: true });
-        navigate("/dashboard");
+      };
+      await setDoc(userRef, userData, { merge: true });
+      localStorage.setItem("user", JSON.stringify(userData));
+      navigate("/dashboard");
     } catch (error) {
       console.error("Google login error:", error);
     }
