@@ -18,7 +18,7 @@ function History() {
       if (user) {
         setUid(user.uid);
         const q = query(
-          collection(db, "posts"),
+          collection(db, "post"),
           where("uid", "==", user.uid)
         );
         const querySnapshot = await getDocs(q);
@@ -93,8 +93,6 @@ function History() {
                   />
                 ))}
               </div>
-          
-              {/* Top Comments Mockup */}
               <div className="flex flex-col gap-4">
               <div className="border rounded-sm p-4 space-y-4">
                 <Label className="text-[3vh] font-semibold">Top Comments:</Label>
@@ -106,6 +104,7 @@ function History() {
               </div>
               <Button className="w-[25%] mx-auto">More Detail</Button>
               </div>
+              <CardDescription>{post.postId}</CardDescription>
             </DialogContent>
           </Dialog>
           

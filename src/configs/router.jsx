@@ -4,6 +4,7 @@ import Layout from "../pages/Layout";
 import Dashboard from "@/pages/dashboard";
 import History from "@/pages/history";
 import GraphTemp from "@/pages/graphTemp";
+import Analysis from "@/pages/analysis";
 
 const router=createBrowserRouter([
     {
@@ -53,6 +54,14 @@ const router=createBrowserRouter([
         element:(
             <>
                 <GraphTemp />
+            </>
+        )
+    },
+    {
+        path: "/analysis",
+        element:(
+            <>
+                <Analysis />
             </>
         )
     },
