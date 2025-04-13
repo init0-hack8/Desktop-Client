@@ -62,9 +62,6 @@ function Analysis() {
     )
   }
 
-  // ----------------------------
-  // Data references (short names)
-  // ----------------------------
   const {
     audience_demographics = {},
     cultural_seasonality = {},
@@ -77,27 +74,32 @@ function Analysis() {
     trending_hashtags = [],
   } = resultData
 
-  // We'll assume sentiment_distribution object has { positive, neutral, negative } numbers
+  // Dynamically build the array for Recharts
   const sentimentChartData = Object.entries(sentiment_distribution || {}).map(
     ([sentimentKey, value]) => ({
-      // e.g. sentimentKey might be "negative", "neutral", "positive"
-      sentiment: sentimentKey,
-      value: value
+      sentiment: sentimentKey, // e.g., "negative", "neutral", "positive"
+      value,
     })
-  );
+  )
+
   // Chart configuration for shadcn/ui chart
   const chartConfig = {
     sentiment: {
       label: "Sentiment",
-      color: "rgba(99, 102, 241, 1)", // indigo color from the original
+      color: "rgba(99, 102, 241, 1)", // Indigo color
     },
   }
 
   return (
     <>
       <Navbar />
-      <div className="flex flex-row gap-6">
-        <div className="p-6 space-y-6">
+
+      {/* Container: left side (flex-1) + right side (fixed width) */}
+      <div className="flex space-x-6 p-6">
+
+        {/* Left Column: Expand to fill remaining width */}
+        <div className="flex-1 min-w-0 space-y-6">
+          {/* 1) Audience Demographics */}
           <div className="flex flex-col gap-4 md:flex-row">
             {Object.entries(audience_demographics).map(([ageRange, bulletPoints]) => (
               <Card key={ageRange} className="w-full md:w-1/3">
@@ -108,22 +110,23 @@ function Analysis() {
                 <CardContent>
                   {Array.isArray(bulletPoints) &&
                     bulletPoints.map((bp, i) => (
-                      <p key={i} className="text-sm mb-2">
-                        • {bp}
-                      </p>
-                    ))}
+                      <p key={i} className="text-sm mb-2">• {bp}</p>
+                    ))
+                  }
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          {/* 2) Cultural Seasonality & Emotional Resonance in a vertical stack */}
+          {/* 2) Cultural Seasonality & Emotional Resonance */}
           <div className="flex flex-col md:flex-row gap-4">
             <Card className="w-full md:w-1/2">
               <CardHeader>
                 <CardTitle>Cultural Seasonality</CardTitle>
                 <CardDescription>
-                  {cultural_seasonality.active ? "Currently in season" : "Not in seasonal timeframe"}
+                  {cultural_seasonality.active
+                    ? "Currently in season"
+                    : "Not in seasonal timeframe"}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -152,13 +155,12 @@ function Analysis() {
             </Card>
           </div>
 
-          {/* 3) Platform Engagement (similar to audience demographics) */}
+          {/* 3) Platform Engagement */}
           <Card>
             <CardHeader>
               <CardTitle>Platform Engagement</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* If platform_engagement is an object with e.g. reddit, twitter, news_forums */}
               {Object.entries(platform_engagement).map(([platformKey, text]) => (
                 <div key={platformKey} className="border p-2 rounded-md">
                   <p className="font-semibold capitalize">{platformKey}</p>
@@ -168,7 +170,21 @@ function Analysis() {
             </CardContent>
           </Card>
 
-          {/* 4) Public Reactions & Recommendations */}
+          {/* 4) Recommendations */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recommendations</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {recommendations.map((rec, i) => (
+                <div key={i} className="p-2 rounded-md border hover:bg-neutral-100 dark:hover:bg-neutral-800">
+                  {rec}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* 5) Public Reactions */}
           <Card>
             <CardHeader>
               <CardTitle>Public Reactions</CardTitle>
@@ -181,7 +197,8 @@ function Analysis() {
               ))}
             </CardContent>
           </Card>
-          {/* 5) Trending Hashtags as a horizontal scroll */}
+
+          {/* 6) Trending Hashtags (horizontal scroll) */}
           {Array.isArray(trending_hashtags) && trending_hashtags.length > 0 && (
             <Card>
               <CardHeader>
@@ -201,38 +218,37 @@ function Analysis() {
             </Card>
           )}
         </div>
-        <div className="mr-20 p-6">
+
+        {/* Right Column: Fixed or limited width so chart is visible */}
+        <div className="flex flex-col gap-6 w-[500px]">
           <Card>
             <CardHeader>
               <CardTitle>Sentiment Distribution</CardTitle>
-              <CardDescription>Radar Chart: Negative, Neutral, Positive</CardDescription>
+              <CardDescription>Radar Chart</CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
-                <RadarChart data={sentimentChartData}>
-                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                <PolarAngleAxis dataKey="sentiment" />
-                <PolarGrid />
-                <Radar
+              <ChartContainer
+                config={chartConfig}
+                className="mx-auto"
+              >
+                <RadarChart
+                  data={sentimentChartData}
+                  width={400}
+                  height={400}
+                  outerRadius="70%"
+                  margin={{ top: 30, right: 30, bottom: 30, left: 30 }}
+                >
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                  <PolarAngleAxis dataKey="sentiment" />
+                  <PolarGrid />
+                  <Radar
                     dataKey="value"
                     fill="var(--color-sentiment)"
                     fillOpacity={0.6}
                     dot={{ r: 4, fillOpacity: 1 }}
-                />
+                  />
                 </RadarChart>
               </ChartContainer>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Recommendations</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {recommendations.map((rec, i) => (
-                <div key={i} className="p-2 rounded-md border hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                  {rec}
-                </div>
-              ))}
             </CardContent>
           </Card>
         </div>
