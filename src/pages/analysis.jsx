@@ -2,29 +2,12 @@
 
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription
-} from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import { collection, query, where, getDocs } from "firebase/firestore"
 import { db } from "@/configs/firebase"
 import Navbar from "@/components/Navbar/Navbar"
-// Recharts components
-import {
-  PolarAngleAxis,
-  PolarGrid,
-  Radar,
-  RadarChart
-} from "recharts"
-// Shadcn chart wrappers
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent
-} from "@/components/ui/chart"
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 function Analysis() {
   const { postId } = useParams()
@@ -81,45 +64,34 @@ function Analysis() {
     )
   }
 
-  // -------------------------------------------------------------------------
-  // Destructure the "old" fields
-  // -------------------------------------------------------------------------
   const {
-    audience_demographics = {},          // existing
-    cultural_seasonality = {},           // existing
-    emotional_resonance,                // existing
-    notes,                               // existing
-    platform_engagement = {},           // existing
-    public_reactions = [],              // existing
-    recommendations = [],               // existing
-    sentiment_distribution = {},        // existing
-    trending_hashtags = [],             // existing
+    audience_demographics = {},  
+    cultural_seasonality = {},   
+    emotional_resonance,        
+    notes,                       
+    platform_engagement = {},   
+    public_reactions = [],      
+    recommendations = [],       
+    sentiment_distribution = {},
+    trending_hashtags = [],     
   } = resultData
 
-  // -------------------------------------------------------------------------
-  // Destructure the "new" fields
-  // -------------------------------------------------------------------------
+
   const {
-    analyzedAt,                          // string date/time
-    audience_segmentation = {},          // map with e.g. 13-17, 18-25, 25-34, 35-50
-    hashtag_intelligence = {},           // map with #NVIDIAMemes, #TechHumor, etc.
-    platform_engagement_styles = {},     // map with instagram, linkedin, etc.
-    post_strategy_summary = {},          // map with enhancement_needed, ideal_audience, ...
-    recommended_actions = [],            // array of new recommended actions
-    sentiment_summary = {},              // map with numeric fields: content_richness, emotional_impact...
+    analyzedAt,                          
+    audience_segmentation = {},       
+    hashtag_intelligence = {},        
+    platform_engagement_styles = {},   
+    post_strategy_summary = {},       
+    recommended_actions = [],            
+    sentiment_summary = {},              
   } = resultData
 
-  // For Recharts RadarChart, we still parse sentiment_distribution as an object:
-  // e.g. { negative: "10% (...)", neutral: "25% (...)", positive: "65% (...)", veryPositive: "67", ... }
-  // These might be strings, so we can keep them as strings or parse out numbers if needed.
   const sentimentChartData = Object.entries(sentiment_distribution).map(([key, val]) => ({
     sentiment: key,
     value: val
   }))
 
-  // We'll also do a second chart if you want to visualize sentiment_summary. 
-  // e.g. { content_richness: 68, emotional_impact: 72, engagement_level: 65, topical_relevance: 55, virality_potential: 78 }
-  // We'll transform it similarly:
   const summaryChartData = Object.entries(sentiment_summary).map(([key, val]) => ({
     metric: key,
     value: val
