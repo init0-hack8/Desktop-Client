@@ -58,10 +58,10 @@ const router=createBrowserRouter([
         )
     },
     {
-        path: "/analysis",
-        element:(
+        path: "/analysis/:postId",
+        element:( 
             <>
-                <Analysis />
+                <Analysis /> 
             </>
         )
     },
