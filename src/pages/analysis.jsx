@@ -78,15 +78,13 @@ function Analysis() {
   } = resultData
 
   // We'll assume sentiment_distribution object has { positive, neutral, negative } numbers
-  const { negative = 0, neutral = 0, positive = 0 } = sentiment_distribution
-
-  // Prepare data for Recharts radar chart
-  const sentimentChartData = [
-    { sentiment: "Negative", value: negative },
-    { sentiment: "Neutral", value: neutral },
-    { sentiment: "Positive", value: positive },
-  ]
-
+  const sentimentChartData = Object.entries(sentiment_distribution || {}).map(
+    ([sentimentKey, value]) => ({
+      // e.g. sentimentKey might be "negative", "neutral", "positive"
+      sentiment: sentimentKey,
+      value: value
+    })
+  );
   // Chart configuration for shadcn/ui chart
   const chartConfig = {
     sentiment: {
@@ -212,18 +210,15 @@ function Analysis() {
             <CardContent>
               <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
                 <RadarChart data={sentimentChartData}>
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                  <PolarAngleAxis dataKey="sentiment" />
-                  <PolarGrid />
-                  <Radar
+                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                <PolarAngleAxis dataKey="sentiment" />
+                <PolarGrid />
+                <Radar
                     dataKey="value"
                     fill="var(--color-sentiment)"
                     fillOpacity={0.6}
-                    dot={{
-                      r: 4,
-                      fillOpacity: 1,
-                    }}
-                  />
+                    dot={{ r: 4, fillOpacity: 1 }}
+                />
                 </RadarChart>
               </ChartContainer>
             </CardContent>
