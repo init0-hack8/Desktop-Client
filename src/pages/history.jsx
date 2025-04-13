@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar/Navbar";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/configs/firebase";
-import { addDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, addDoc } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -27,9 +27,37 @@ function History() {
     });
     return () => unsubscribe();
   }, []);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(false)
+  const docId = 'post-b2658470-1759-4884-a118-607b242bf9aa'
+  async function copyShit() {
+    setLoading(true)
+    setError(null)
+    setSuccess(false)
+    try {
+      // 1) Read from "analysis/post-b2658470..."
+      const fromRef = doc(db, 'analysis', docId)
+      const fromSnap = await getDoc(fromRef)
+      if (!fromSnap.exists()) {
+        throw new Error(`Doc not found in "analysis" with ID: ${docId}`)
+      }
+      const dataToCopy = fromSnap.data()
+
+      // 2) Write to "result/post-b2658470..."
+      const toRef = doc(db, 'result', docId)
+      await setDoc(toRef, dataToCopy)
+      setSuccess(true)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
   return (
     <div>
       <Navbar />
+      {/* <Button onClick={copyShit}>MAGIC COPY BUTTON GO FUCK YOURSELF</Button> */}
       <div className="max-w-6xl mx-auto p-6">
         <h1 className="text-3xl font-semibold mb-6">Your Posts</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
